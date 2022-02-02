@@ -13,9 +13,9 @@ class CityService
         $this->cityObject = new City;
     }
 
-    public function getCityServices(int $columnId = null, int $page = null, int $pageSize = null)
+    public function getCityServices(int $columnId = null, int $page = null, int $pageSize = null, string $fields = null)
     {
-        return $this->cityObject->get($columnId, $page, $pageSize);
+        return $this->cityObject->get($columnId, $page, $pageSize, $fields);
     }
 
     public function addCityServices(array $parameters): int

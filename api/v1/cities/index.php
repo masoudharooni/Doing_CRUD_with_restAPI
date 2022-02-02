@@ -16,13 +16,23 @@ switch ($requestMethod) {
         $requestGetData = [
             'cityID' => $_GET['city_id'] ?? null,
             'pageSize' => $_GET['page_size'] ?? null,
-            'page' => $_GET['page'] ?? null
+            'page' => $_GET['page'] ?? null,
+            'fields' => $_GET['fields'] ?? '*'
         ];
         $dataGetValidator = [
             "city" => !is_null($requestGetData['cityID']) || !is_numeric($requestGetData['cityID']),
             "page" => !is_null($requestGetData['page']) || !is_numeric($requestGetData['page']),
-            "pageSize" => !is_null($requestGetData['pageSize']) || !is_numeric($requestGetData['pageSize'])
+            "pageSize" => !is_null($requestGetData['pageSize']) || !is_numeric($requestGetData['pageSize']),
+            "fields" => !is_null($requestGetData['fields']) || !is_string($requestGetData['fields'])
         ];
+        if (!$dataGetValidator['fields'])
+            Response::respondByDie(["Error" => "Parameters is not valid!"], Response::HTTP_NOT_ACCEPTABLE);
+
+        if (!$cityValidator->areValidFields($requestGetData['fields']))
+            Response::respondByDie(["Error" => "Fields not exist!!"], Response::HTTP_NOT_ACCEPTABLE);
+
+
+
         if (!$dataGetValidator['city'] || !$dataGetValidator['page'] || !$dataGetValidator['pageSize'])
             Response::respondByDie(["Error" => "Parameters is not valid!"], Response::HTTP_NOT_ACCEPTABLE);
 
@@ -30,7 +40,7 @@ switch ($requestMethod) {
             if (!$cityValidator->isExistCity($requestGetData['cityID']))
                 Response::respondByDie(["Error" => "This city is not exist!"], Response::HTTP_NOT_ACCEPTABLE);
 
-        $responseData = $cityServices->getCityServices($requestGetData['cityID'], $requestGetData['page'], $requestGetData['pageSize']);
+        $responseData = $cityServices->getCityServices($requestGetData['cityID'], $requestGetData['page'], $requestGetData['pageSize'], $requestGetData['fields']);
         Response::respondByDie($responseData, Response::HTTP_OK);
 
     case 'POST':

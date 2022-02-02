@@ -37,4 +37,14 @@ class Validator extends Connect
             return false;
         return true;
     }
+
+    public function areValidFields(string $fields): bool
+    {
+        $exploadeFields = explode(",", $fields);
+        $ourFieldsInDB = ['id', 'province_id', 'name' , '*'];
+        foreach ($exploadeFields as $value)
+            if (!in_array($value, $ourFieldsInDB))
+                return false;
+        return true;
+    }
 }
