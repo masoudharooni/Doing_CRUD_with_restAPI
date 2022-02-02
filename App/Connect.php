@@ -6,11 +6,11 @@ class Connect
 {
     # Object connection to dataBase by PDO
     protected $conn;
-    # Data base information
+    # Database information
     private $hostName = "localhost";
     private $userName = "root";
     private $password = "";
-    private $dbName = "iran";
+    private $dbName = "iran2";
     private $charSet = "utf8mb4";
     private $dbms = "mysql";
 

@@ -8,7 +8,7 @@ class City extends Iran
     /**
      * Add a city in the database 
      * This method will return last insert city id
-     * @param array $parameters
+     * @param array $parameters[provinceId , name]
      * @return integer 
      */
     public function add(array $parameters): int
@@ -20,10 +20,10 @@ class City extends Iran
     }
     public function update(array $parameters): bool
     {
-        $sql = "UPDATE {$this->tableName} SET province_id = :province_id , name = :name WHERE id = :id";
+        $sql = "UPDATE {$this->tableName} SET name = :name WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([
-            ':id' => $parameters['id'], ':province_id' => $parameters['province_id'], ':name' => $parameters['name']
+            ':id' => $parameters['id'],  ':name' => $parameters['name']
         ]) ?: false;
     }
 }

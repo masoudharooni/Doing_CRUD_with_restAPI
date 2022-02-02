@@ -36,11 +36,20 @@ abstract class Iran extends Connect implements \addAble, \deleteAble, \updateAbl
      * @param integer|null $columnId
      * @return object
      */
-    public function get(int $columnId = null)
+    public function get(int $columnId = null, ?int $page = 1, ?int $pageSize = 10)
     {
-        is_null($columnId) ? $sql = "SELECT * FROM {$this->tableName}" : $sql = "SELECT * FROM {$this->tableName} WHERE id = ?";
+        $start_from_which_column = ($page - 1) * $pageSize;
+        if (is_null($columnId)) {
+            $sql = "SELECT * FROM {$this->tableName} LIMIT {$start_from_which_column},{$pageSize}";
+        } else {
+            $sql = "SELECT * FROM {$this->tableName} WHERE id = :id";
+        }
         $stmt = $this->conn->prepare($sql);
-        is_null($columnId) ? $stmt->execute() : $stmt->execute([$columnId]);
+        if (is_null($columnId)) {
+            $stmt->execute([]);
+        } else {
+            $stmt->execute(["id" => $columnId]);
+        }
         return $stmt->fetchAll(\PDO::FETCH_OBJ) ?? null;
     }
 }
