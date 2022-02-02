@@ -13,36 +13,25 @@ $getRequestData = json_decode(file_get_contents('php://input'), true);
 // We don't have any break command in the our switch case, because we use respondByDie method and it will die script after running
 switch ($requestMethod) {
     case 'GET':
-        $cityID = $_GET['city_id'] ?? null;
-        $page = $_GET['page'] ?? null;
-        $pageSize = $_GET['page_size'] ?? null;
-        if (is_numeric($cityID) || is_null($cityID)) {
-            if ((is_numeric($page) || is_null($page)) && $page > 0) {
-                if (is_numeric($pageSize) || is_null($pageSize)) {
-                    if ((is_null($pageSize) == is_null($page)) || (is_numeric($page) == is_numeric($pageSize))) {
-                        if (!is_null($cityID)) {
-                            if ($cityValidator->isExistCity($cityID)) {
-                                $responseData = $cityServices->getCityServices($cityID, $page, $pageSize);
-                                Response::respondByDie($responseData, Response::HTTP_OK);
-                            } else {
-                                Response::respondByDie(['Error' => 'This city is not exsist!'], Response::HTTP_NOT_FOUND);
-                            }
-                        } else {
-                            $responseData = $cityServices->getCityServices($cityID, $page, $pageSize);
-                            Response::respondByDie($responseData, Response::HTTP_OK);
-                        }
-                    } else {
-                        Response::respondByDie(["Error" => "Page and page_size should fill together!"], Response::HTTP_NOT_ACCEPTABLE);
-                    }
-                } else {
-                    Response::respondByDie(["Error" => "Page_size parameter should be an integer!"], Response::HTTP_NOT_ACCEPTABLE);
-                }
-            } else {
-                Response::respondByDie(["Error" => "Page parameter should be an integer and greather than 0"], Response::HTTP_NOT_ACCEPTABLE);
-            }
-        } else {
-            Response::respondByDie(["Error" => "City Id should be an integer!"], Response::HTTP_NOT_ACCEPTABLE);
-        }
+        $requestGetData = [
+            'cityID' => $_GET['city_id'] ?? null,
+            'pageSize' => $_GET['page_size'] ?? null,
+            'page' => $_GET['page'] ?? null
+        ];
+        $dataGetValidator = [
+            "city" => !is_null($requestGetData['cityID']) || !is_numeric($requestGetData['cityID']),
+            "page" => !is_null($requestGetData['page']) || !is_numeric($requestGetData['page']),
+            "pageSize" => !is_null($requestGetData['pageSize']) || !is_numeric($requestGetData['pageSize'])
+        ];
+        if (!$dataGetValidator['city'] || !$dataGetValidator['page'] || !$dataGetValidator['pageSize'])
+            Response::respondByDie(["Error" => "Parameters is not valid!"], Response::HTTP_NOT_ACCEPTABLE);
+
+        if (is_numeric($requestGetData['cityID']))
+            if (!$cityValidator->isExistCity($requestGetData['cityID']))
+                Response::respondByDie(["Error" => "This city is not exist!"], Response::HTTP_NOT_ACCEPTABLE);
+
+        $responseData = $cityServices->getCityServices($requestGetData['cityID'], $requestGetData['page'], $requestGetData['pageSize']);
+        Response::respondByDie($responseData, Response::HTTP_OK);
 
     case 'POST':
         $cityIdAdded = $cityServices->addCityServices($getRequestData);
