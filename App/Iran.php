@@ -36,18 +36,20 @@ abstract class Iran extends Connect implements \addAble, \deleteAble, \updateAbl
      * @param integer|null $columnId
      * @return object
      */
-    public function get(int $columnId = null, int $page = null, int $pageSize = null, string $fields = null)
+    public function get(int $columnId = null, int $page = null, int $pageSize = null, string $fields = null, string $order = null)
     {
         $limit = '';
         $fields = $fields ?? '*';
+        $order = $order ?? "ASC";
+        $order = "ORDER BY id {$order}";
         if (!is_null($page) and !is_null($pageSize)) {
             $start_from_which_column = ($page - 1) * $pageSize;
             $limit = " LIMIT {$start_from_which_column},{$pageSize}";
         }
         if (is_null($columnId)) {
-            $sql = "SELECT {$fields} FROM {$this->tableName} {$limit}";
+            $sql = "SELECT {$fields} FROM {$this->tableName} {$limit} {$order}";
         } else {
-            $sql = "SELECT {$fields} FROM {$this->tableName} WHERE id = ? {$limit}";
+            $sql = "SELECT {$fields} FROM {$this->tableName} WHERE id = ? {$limit} {$order}";
         }
         $stmt = $this->conn->prepare($sql);
         if (is_null($columnId)) {
