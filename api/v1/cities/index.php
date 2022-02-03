@@ -7,9 +7,6 @@ use App\Utilities\Caching;
 
 include_once "../../../authoload.php";
 
-Caching::start();
-echo "Hello " . rand(1000, 9999);
-Caching::end();
 
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
@@ -19,6 +16,10 @@ $getRequestData = json_decode(file_get_contents('php://input'), true);
 // We don't have any break command in the our switch case, because we use respondByDie method and it will die script after running
 switch ($requestMethod) {
     case 'GET':
+        if (Caching::isExistCache())
+            Response::setHeaders(Response::HTTP_OK);
+        # start caching with Caching::start() method
+        Caching::start();
         $requestGetData = [
             'cityID' => $_GET['city_id'] ?? null,
             'pageSize' => $_GET['page_size'] ?? null,
@@ -49,8 +50,9 @@ switch ($requestMethod) {
                 Response::respondByDie(["Error" => "This city is not exist!"], Response::HTTP_NOT_ACCEPTABLE);
 
         $responseData = $cityServices->getCityServices($requestGetData['cityID'], $requestGetData['page'], $requestGetData['pageSize'], $requestGetData['fields'], $requestGetData['order']);
-        Response::respondByDie($responseData, Response::HTTP_OK);
-
+        echo Response::respond($responseData, Response::HTTP_OK);
+        Caching::end();
+        exit;
     case 'POST':
         $cityIdAdded = $cityServices->addCityServices($getRequestData);
         if ($cityValidator->isValidCity($getRequestData)) {

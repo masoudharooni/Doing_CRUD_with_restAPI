@@ -15,12 +15,17 @@ class Caching
             self::$cachEnable = 0;
     }
 
+    public static function isExistCache(): bool
+    {
+        Caching::init();
+        return (file_exists(self::$cachFile) && (time() - self::$cachExpireTime) < filemtime(self::$cachFile));
+    }
+
     public static function start()
     {
-        self::init();
         if (!self::$cachEnable)
             return;
-        if (file_exists(self::$cachFile) && (time() - self::$cachExpireTime) < filemtime(self::$cachFile)) {
+        if (self::isExistCache()) {
             readfile(self::$cachFile);
             exit;
         }
