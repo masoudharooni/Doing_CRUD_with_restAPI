@@ -1,4 +1,5 @@
 <?php
+const CACHE_DIR = __DIR__ . "/cache";
 # Authoload function for authomaticly including
 spl_autoload_register(function (string $class) {
     $path =  __DIR__ . "/{$class}.php";

@@ -47,9 +47,9 @@ abstract class Iran extends Connect implements \addAble, \deleteAble, \updateAbl
             $limit = " LIMIT {$start_from_which_column},{$pageSize}";
         }
         if (is_null($columnId)) {
-            $sql = "SELECT {$fields} FROM {$this->tableName} {$limit} {$order}";
+            $sql = "SELECT {$fields} FROM {$this->tableName} {$order} {$limit}";
         } else {
-            $sql = "SELECT {$fields} FROM {$this->tableName} WHERE id = ? {$limit} {$order}";
+            $sql = "SELECT {$fields} FROM {$this->tableName} WHERE id = ? {$order} {$limit}";
         }
         $stmt = $this->conn->prepare($sql);
         if (is_null($columnId)) {

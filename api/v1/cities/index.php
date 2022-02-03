@@ -3,8 +3,14 @@
 use App\Services\CityService;
 use App\Utilities\Response;
 use App\Validator;
+use App\Utilities\Caching;
 
 include_once "../../../authoload.php";
+
+Caching::start();
+echo "Hello " . rand(1000, 9999);
+Caching::end();
+
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $cityServices = new CityService;
@@ -26,7 +32,7 @@ switch ($requestMethod) {
             "pageSize" => !is_null($requestGetData['pageSize']) || !is_numeric($requestGetData['pageSize']),
             "fields" => !is_null($requestGetData['fields']) || !is_string($requestGetData['fields'])
         ];
-        if (!in_array($requestGetData['order'], ["ASC", "DESC" , "asc" , "desc"]))
+        if (!in_array($requestGetData['order'], ["ASC", "DESC", "asc", "desc"]))
             Response::respondByDie(["Error" => "Order parameter should be ASC or DESC"], Response::HTTP_NOT_ACCEPTABLE);
 
         if (!$dataGetValidator['fields'])
@@ -42,7 +48,7 @@ switch ($requestMethod) {
             if (!$cityValidator->isExistCity($requestGetData['cityID']))
                 Response::respondByDie(["Error" => "This city is not exist!"], Response::HTTP_NOT_ACCEPTABLE);
 
-        $responseData = $cityServices->getCityServices($requestGetData['cityID'], $requestGetData['page'], $requestGetData['pageSize'], $requestGetData['fields'] , $requestGetData['order']);
+        $responseData = $cityServices->getCityServices($requestGetData['cityID'], $requestGetData['page'], $requestGetData['pageSize'], $requestGetData['fields'], $requestGetData['order']);
         Response::respondByDie($responseData, Response::HTTP_OK);
 
     case 'POST':
