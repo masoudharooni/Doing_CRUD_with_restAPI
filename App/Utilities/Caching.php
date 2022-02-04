@@ -15,7 +15,7 @@ class Caching
             self::$cachEnable = 0;
     }
 
-    public static function isExistCache(): bool
+    public static function isExistCacheFile(): bool
     {
         Caching::init();
         return (file_exists(self::$cachFile) && (time() - self::$cachExpireTime) < filemtime(self::$cachFile));
@@ -25,7 +25,7 @@ class Caching
     {
         if (!self::$cachEnable)
             return;
-        if (self::isExistCache()) {
+        if (self::isExistCacheFile()) {
             readfile(self::$cachFile);
             exit;
         }

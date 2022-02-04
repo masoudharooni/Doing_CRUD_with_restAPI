@@ -1,6 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Validator;
+
+use App\Connect;
 
 class Validator extends Connect
 {
@@ -38,10 +40,32 @@ class Validator extends Connect
         return true;
     }
 
-    public function areValidFields(string $fields): bool
+    private function isValidProvince(array $parameters, string $situation): bool
+    {
+        if ($situation == "add") {
+            if (sizeof($parameters) != 1 || strlen($parameters['name']) < 2 || !is_string($parameters['name']))
+                return false;
+            return true;
+        } elseif ($situation == "update") {
+            if (sizeof($parameters) != 2 || strlen($parameters['name']) < 2 || !is_string($parameters['name']) || !is_int($parameters['id']))
+                return false;
+            return true;
+        }
+    }
+    public function isValidProvinceForAdd(array $parameters): bool
+    {
+        return $this->isValidProvince($parameters, "add");
+    }
+    public function isValidProvinceForUpdate(array $parameters): bool
+    {
+        return $this->isValidProvince($parameters, "update");
+    }
+
+
+    public function areValidCityFields(string $fields): bool
     {
         $exploadeFields = explode(",", $fields);
-        $ourFieldsInDB = ['id', 'province_id', 'name' , '*'];
+        $ourFieldsInDB = ['id', 'province_id', 'name', '*'];
         foreach ($exploadeFields as $value)
             if (!in_array($value, $ourFieldsInDB))
                 return false;
