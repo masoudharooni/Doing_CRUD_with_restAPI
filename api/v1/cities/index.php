@@ -1,5 +1,8 @@
 <?php
 
+use App\Utilities\UserUtility;
+use App\Services\TokenGenerator;
+use App\Utilities\Authorization;
 use App\Services\CityService;
 use App\Utilities\Response;
 use App\Validator\Validator;
@@ -7,7 +10,16 @@ use App\Utilities\Caching;
 
 include_once "../../../authoload.php";
 
+$jwtToken = Authorization::getBearerToken();
+$tokenDecoder = new TokenGenerator;
+$tokenDecoded = $tokenDecoder->decode($jwtToken);
+if (is_null($tokenDecoded))
+    Response::respondByDie(['Invalid Token!'], Response::HTTP_UNAUTHORIZED);
 
+if (!UserUtility::isExistUserById($tokenDecoded->id))
+    Response::respondByDie(["User's Token is not valid!"], Response::HTTP_UNAUTHORIZED);
+
+# user authorizaed
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $cityServices = new CityService;

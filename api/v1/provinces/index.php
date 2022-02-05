@@ -1,11 +1,25 @@
 <?php
 
 use App\Services\ProvinceServices;
+use App\Services\TokenGenerator;
+use App\Utilities\Authorization;
 use App\Utilities\Response;
 use App\Utilities\Caching;
+use App\Utilities\UserUtility;
 use App\Validator\Validator;
 
 include "../../../authoload.php";
+
+$jwtToken = Authorization::getBearerToken();
+$tokenDecoder = new TokenGenerator;
+$tokenDecoded = $tokenDecoder->decode($jwtToken);
+if (is_null($tokenDecoded))
+    Response::respondByDie(['Invalid Token!'], Response::HTTP_UNAUTHORIZED);
+
+if (!UserUtility::isExistUserById($tokenDecoded->id))
+    Response::respondByDie(["User's Token is not valid!"], Response::HTTP_UNAUTHORIZED);
+
+# user authorizaed
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $provinceServices = new ProvinceServices;
 $provinceValidator = new Validator;
