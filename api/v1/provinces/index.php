@@ -12,12 +12,9 @@ include "../../../authoload.php";
 
 $jwtToken = Authorization::getBearerToken();
 $tokenDecoder = new TokenGenerator;
-$tokenDecoded = $tokenDecoder->decode($jwtToken);
-if (is_null($tokenDecoded))
+$user = $tokenDecoder->decode($jwtToken);
+if (is_null($user))
     Response::respondByDie(['Invalid Token!'], Response::HTTP_UNAUTHORIZED);
-
-if (!UserUtility::isExistUserById($tokenDecoded->id))
-    Response::respondByDie(["User's Token is not valid!"], Response::HTTP_UNAUTHORIZED);
 
 # user authorizaed
 $requestMethod = $_SERVER['REQUEST_METHOD'];
@@ -26,9 +23,6 @@ $provinceValidator = new Validator;
 $getBodyRequestData = json_decode(file_get_contents('php://input'), true);
 switch ($requestMethod) {
     case 'GET':
-        if (Caching::isExistCacheFile())
-            Response::setHeaders(Response::HTTP_OK);
-        Caching::start();
         $requestGetData = [
             'provinceID' => $_GET['id'] ?? null,
             'pageSize' => $_GET['page_size'] ?? null,
@@ -36,6 +30,12 @@ switch ($requestMethod) {
             'fields' => $_GET['fields'] ?? '*',
             'order' => $_GET['order'] ?? 'ASC'
         ];
+        if (!UserUtility::hasAccessToProvinces($user, $requestGetData['provinceID']))
+            Response::respondByDie(['You do not have an access!'], Response::HTTP_FORBIDDEN);
+
+        if (Caching::isExistCacheFile())
+            Response::setHeaders(Response::HTTP_OK);
+        Caching::start();
         $dataGetValidator = [
             "provinceID" => (is_null($requestGetData['provinceID']) || is_numeric($requestGetData['provinceID'])),
             "pageSize" => (is_null($requestGetData['pageSize']) || is_numeric($requestGetData['pageSize'])),

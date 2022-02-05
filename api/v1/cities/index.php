@@ -12,12 +12,9 @@ include_once "../../../authoload.php";
 
 $jwtToken = Authorization::getBearerToken();
 $tokenDecoder = new TokenGenerator;
-$tokenDecoded = $tokenDecoder->decode($jwtToken);
-if (is_null($tokenDecoded))
+$user = $tokenDecoder->decode($jwtToken);
+if (is_null($user))
     Response::respondByDie(['Invalid Token!'], Response::HTTP_UNAUTHORIZED);
-
-if (!UserUtility::isExistUserById($tokenDecoded->id))
-    Response::respondByDie(["User's Token is not valid!"], Response::HTTP_UNAUTHORIZED);
 
 # user authorizaed
 
@@ -28,10 +25,6 @@ $getRequestData = json_decode(file_get_contents('php://input'), true);
 // We don't have any break command in the our switch case, because we use respondByDie method and it will die script after running
 switch ($requestMethod) {
     case 'GET':
-        if (Caching::isExistCacheFile())
-            Response::setHeaders(Response::HTTP_OK);
-        # start caching with Caching::start() method
-        Caching::start();
         $requestGetData = [
             'cityID' => $_GET['id'] ?? null,
             'pageSize' => $_GET['page_size'] ?? null,
@@ -39,6 +32,13 @@ switch ($requestMethod) {
             'fields' => $_GET['fields'] ?? '*',
             'order' => $_GET['order'] ?? 'ASC'
         ];
+        if (!UserUtility::hasAccessToCities($user, $requestGetData['cityID']))
+            Response::respondByDie(["You don't have an access!"], Response::HTTP_FORBIDDEN);
+
+        if (Caching::isExistCacheFile())
+            Response::setHeaders(Response::HTTP_OK);
+        # start caching with Caching::start() method
+        Caching::start();
         $dataGetValidator = [
             "city" => is_null($requestGetData['cityID']) || is_numeric($requestGetData['cityID']),
             "page" => is_null($requestGetData['page']) || is_numeric($requestGetData['page']),

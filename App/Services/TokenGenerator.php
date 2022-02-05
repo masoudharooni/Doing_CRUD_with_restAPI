@@ -11,17 +11,20 @@ class TokenGenerator
     private $payload;
     public function generate(string $email): ?string
     {
-        $userId = UserUtility::isExistUserByEmail($email);
-        if (is_null($userId))
+        $user = UserUtility::isExistUserByEmail($email);
+        if (is_null($user))
             return null;
-        $this->payload = ['id' => $userId];
+        $this->payload = ['id' => $user['id']];
         return JWT::encode($this->payload, JWT_KEY, JWT_ALG);
     }
 
-    public function decode(string $jwt, string $key = JWT_KEY, string $alg = JWT_ALG): ?object
+    public function decode(string $jwt = null, string $key = JWT_KEY, string $alg = JWT_ALG): ?array
     {
+        if (is_null($jwt))
+            return null;
         try {
-            return JWT::decode($jwt, new key($key, $alg));
+            $payload = JWT::decode($jwt, new key($key, $alg));
+            return UserUtility::isExistUserById($payload->id);
         } catch (\Exception $e) {
             return null;
         }

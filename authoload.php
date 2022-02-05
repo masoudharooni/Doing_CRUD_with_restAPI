@@ -1,9 +1,9 @@
 <?php
 # JWT Token constant
 const USERS = [
-    ["id" => 1, "name" => "Masoud", "sirName" => "Harooni", 'email' => "masoudharooni50@gmail.com"],
-    ["id" => 2, "name" => "Ali", "sirName" => "Alizadeh", 'email' => 'ali@gmail.com'],
-    ["id" => 3, "name" => "Asghar", "sirName" => "Asghary", 'email' => 'asghar@gmail.com']
+    ["id" => 1, 'role' => 'admin', "name" => "Masoud", "sirName" => "Harooni", 'email' => "masoudharooni50@gmail.com"],
+    ["id" => 2, 'role' => 'president', "name" => "Ali", "sirName" => "Alizadeh", 'email' => 'ali@gmail.com'],
+    ["id" => 3, 'role' => 'mayor', 'province_access_control' => [1, 2, 3], 'city_access_control' => [4, 5, 6], "name" => "Asghar", "sirName" => "Asghary", 'email' => 'asghar@gmail.com']
 ];
 const JWT_KEY = "MasoudaasdfasdfasdfqwedfaszxcvfgqwaHarooniasdfasdfreqoiwefjasd";
 const JWT_ALG = "HS256";
